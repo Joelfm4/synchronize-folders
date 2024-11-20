@@ -1,26 +1,25 @@
 import os
 import hashlib
-from typing_extensions import Optional, List
-from datetime import datetime
+from typing_extensions import List
 
 
 class Node:
-    def __init__(self, name, path, is_file, timestamp):
+    def __init__(self, name, path, is_file):
         self.name = name
         self.path = path
         self.is_file = is_file
-        self.hash: Optional[str] = None 
+        self.hash:str = ""
         self.children: List['Node'] = []
-        self.timestamp = timestamp
 
     def __str__(self, level=0) -> str:
-        ret = "\t" * level + f"Node(name={self.name}, is_file={self.is_file}, hash={self.hash}, path={self.path}, timestamp={self.timestamp})\n"
+        ret = "\t" * level + f"Node(name={self.name}, is_file={self.is_file}, hash={self.hash}, path={self.path})\n"
+
         for child in self.children:
             ret += child.__str__(level + 1)
         return ret
 
     def __repr__(self) -> str:
-        return f"Node(name={self.name}, path={self.path}, is_file={self.is_file}, hash={self.hash})"
+        return f"Node(name={self.name}, path={self.path}, is_file={self.is_file}, hash={self.hash}, children={self.children})"
 
 
 
@@ -32,26 +31,24 @@ def calculate_hash(file_path:str) -> str:
 
 
 def build_tree(path:str) -> Node:
-    path:str = os.path.normpath(path)
-    is_file:bool = os.path.isfile(path)
-    node:Node = Node(name=os.path.basename(path), path=path, is_file=is_file, timestamp=datetime.now())
+    normalized_path:str = os.path.normpath(path)
+    is_file:bool = os.path.isfile(normalized_path)
+    node:Node = Node(name=os.path.basename(normalized_path), path=normalized_path, is_file=is_file)
 
     if is_file:
-        node.hash = calculate_hash(path)
+        node.hash = calculate_hash(normalized_path)
 
     else:
-        for item in os.listdir(path):
-            child_path:str = os.path.join(path, item)
+        for item in os.listdir(normalized_path):
+            child_path:str = os.path.join(normalized_path, item)
             node.children.append(build_tree(child_path))
 
     return node
 
 
 
-def main(path:str) -> None:
-    return build_tree(path) 
 
 
 
 if __name__ == "__main__":
-    print(main("D:/Root"))
+    print(build_tree("D:/Root"))

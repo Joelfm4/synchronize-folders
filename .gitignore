@@ -1,0 +1,14 @@
+# Virtual environment
+.venv/
+
+
+# Cache directories
+__pycache__/
+
+# Python cache files
+*.pyc
+*.pyo
+
+
+
+
