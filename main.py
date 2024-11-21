@@ -1,28 +1,20 @@
-from src.tree_builder import *
 from src.input_validation import validation
 import src.synchronization_folders as sync
+from src.keep_folder_update import start_folder_monitoring 
 import copy
 
+
 def main():
-    # Get user inputs and verify them
-    original_path, replica_path, interval, log_file_path = validation() 
-
-    original_node:Node = build_tree(original_path)
-
-    replica_node:Node = build_tree(replica_path)
+    original_folder_path, replica_folder_path, interval, log_file_path = validation() 
 
     interval:int = interval 
+    sync.log_file_path = log_file_path
 
+    if sync.replica_folder_is_empty(replica_folder_path):
+        sync.duplicate_original(original_folder_path, replica_folder_path) 
 
-    # First Sync
-    if sync.replica_folder_existence(replica_path):
-        sync.log_file_path = log_file_path
-        sync.duplicate_original(original_node, replica_path)
-        replica_node = copy.deepcopy(original_node)
-
-    
-    # Check for chances
-    
+    else:
+        sync.update_replica_folder(original_folder_path, replica_folder_path)
 
 
 
