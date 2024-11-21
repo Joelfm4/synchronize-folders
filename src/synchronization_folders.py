@@ -55,20 +55,20 @@ def duplicate_original(original_folder_path:str, replica_folder_path:str) -> Non
 
 def copy_file(original_file: str, replica_file: str) -> None:
     replica_dir = os.path.dirname(replica_file)
-    if not os.path.exists(replica_dir):
+    if not os.path.exists(path=replica_dir):
         os.makedirs(replica_dir)
 
-    shutil.copy2(original_file, replica_file)
+    shutil.copy2(src=original_file, dst=replica_file)
     print(f"Copied: {original_file} -> {replica_file}")  # LOG
 
 
 def delete_extra_files(replica_path: str) -> None:
     if os.path.isfile(replica_path):
-        os.remove(replica_path)
+        os.remove(path=replica_path)
         print(f"Deleted file: {replica_path}")  # LOG
 
     elif os.path.isdir(replica_path):
-        shutil.rmtree(replica_path)
+        shutil.rmtree(path=replica_path)
         print(f"Deleted folder: {replica_path}")  # LOG
 
 
