@@ -1,7 +1,6 @@
 from src.input_validation import validation
 import src.synchronization_folders as sync
 from src.keep_folder_update import start_folder_monitoring 
-import copy
 
 
 def main():
@@ -15,6 +14,8 @@ def main():
 
     else:
         sync.update_replica_folder(original_folder_path, replica_folder_path)
+
+    
 
 
 
