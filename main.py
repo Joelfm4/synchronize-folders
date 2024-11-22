@@ -1,6 +1,6 @@
 import src.synchronization_folders as sync
 from src.input_validation import validation
-from src.keep_folder_update import FolderMonitor
+from src.watch_changes import FolderMonitor
 import logging
 import time
 
@@ -20,8 +20,10 @@ def configure_logging(log_file_path):
     logger = logging.getLogger()
     logger.addHandler(console_handler)
 
-def process_events(changes):
+
+def process_events(changes) -> list:
     processed = {}
+
     for change in changes:
         path = change["path"]
         if change["type"] == "Deleted":
@@ -34,12 +36,13 @@ def process_events(changes):
 
 def main():
     original_folder_path, replica_folder_path, interval, log_file_path = validation() 
-
     configure_logging(log_file_path)
+
 
     # Sync the replica folder if necessary
     if sync.replica_folder_is_empty(replica_folder_path):
         sync.duplicate_original(original_folder_path, replica_folder_path) 
+
     else:
         sync.update_replica_folder(original_folder_path, replica_folder_path)
 
@@ -54,17 +57,21 @@ def main():
 
             changes = folder_monitor.get_changes()
             print(changes)
+            print("-"*30)
 
             if changes:
                 changes = process_events(changes)
                 print(changes)
+                folder_monitor.stop()
                 # Exemplo: synchronization.apply_changes(changes)
             
             folder_monitor.get_changes()
+
+
     except KeyboardInterrupt:
-        logging.info("Monitoring stopped by user.")
+        folder_monitor.stop()
     finally:
-        folder_monitor.stop()  # Certifica-se de que o monitoramento seja parado corretamente
+        folder_monitor.stop()
 
 
 
