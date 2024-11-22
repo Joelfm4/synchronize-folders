@@ -114,8 +114,13 @@ def update_replica_folder(original_folder_path: str, replica_folder_path: str) -
 
 
 
-def synchronize(main_folder_tree, replica_folder_tree):
-     ...
+def synchronize(main_folder_tree:str, replica_folder_tree:str, changes:list):
+    """
+Sabemos que tem changes
+
+Verificar o tipo (add, remove, edit, rename)
+    """
+    ...
 
 
 
