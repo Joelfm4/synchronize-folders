@@ -1,21 +1,71 @@
-from src.input_validation import validation
 import src.synchronization_folders as sync
-from src.keep_folder_update import start_folder_monitoring 
+from src.input_validation import validation
+from src.keep_folder_update import FolderMonitor
+import logging
+import time
+
+def configure_logging(log_file_path):
+    logging.basicConfig(
+        filename=log_file_path,
+        format='%(levelname)s - %(asctime)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S',
+        level=logging.INFO
+    )
+    
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    console_formatter = logging.Formatter('%(levelname)s - %(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    console_handler.setFormatter(console_formatter)
+
+    logger = logging.getLogger()
+    logger.addHandler(console_handler)
+
+def process_events(changes):
+    processed = {}
+    for change in changes:
+        path = change["path"]
+        if change["type"] == "Deleted":
+            processed[path] = change  
+        elif path not in processed or processed[path]["type"] != "Deleted":
+            processed[path] = change 
+
+    return list(processed.values())
 
 
 def main():
     original_folder_path, replica_folder_path, interval, log_file_path = validation() 
 
-    interval:int = interval 
-    sync.log_file_path = log_file_path
+    configure_logging(log_file_path)
 
+    # Sync the replica folder if necessary
     if sync.replica_folder_is_empty(replica_folder_path):
         sync.duplicate_original(original_folder_path, replica_folder_path) 
-
     else:
         sync.update_replica_folder(original_folder_path, replica_folder_path)
 
-    
+
+    # Start Monitoring 
+    folder_monitor = FolderMonitor(original_folder_path)
+    folder_monitor.start()
+
+    try:
+        while True:
+            time.sleep(interval )
+
+            changes = folder_monitor.get_changes()
+            print(changes)
+
+            if changes:
+                changes = process_events(changes)
+                print(changes)
+                # Exemplo: synchronization.apply_changes(changes)
+            
+            folder_monitor.get_changes()
+    except KeyboardInterrupt:
+        logging.info("Monitoring stopped by user.")
+    finally:
+        folder_monitor.stop()  # Certifica-se de que o monitoramento seja parado corretamente
+
 
 
 
