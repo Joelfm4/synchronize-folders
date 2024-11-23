@@ -118,12 +118,11 @@ def synchronize(original_folder_path:str, replica_folder_path:str, changes:list)
     for change in changes:
         rel_path:str = os.path.relpath(change['path'], original_folder_path)
         dst_path:str = os.path.join(replica_folder_path, rel_path)
-        print(changes)
 
         if change['type'] == 'created':
 
             if os.path.isfile(change['path']):
-                copy_file(change['path'], dst_path)
+                shutil.copy2(src=change['path'], dst=dst_path) 
                 logging.info(f"[CREATED] File: {dst_path}")
             else:
                 shutil.copytree(change['path'], dst_path)
@@ -131,8 +130,7 @@ def synchronize(original_folder_path:str, replica_folder_path:str, changes:list)
 
 
         elif change['type'] == 'deleted':
-
-            if os.path.isfile(change['path']):
+            if change['is_file']:
                 os.remove(dst_path)
                 logging.info(f"[DELETED] File: {os.path.normpath(dst_path)}")
             else:
@@ -143,11 +141,28 @@ def synchronize(original_folder_path:str, replica_folder_path:str, changes:list)
         elif change['type'] == 'renamed':
 
             if change['is_file']:
-                os.rename(dst_path, change['path'])
-                logging.info(f"[RENAMED] File: {os.path.normpath(dst_path)} -> {os.path.normpath(change['path'])}")
+                relative_src_path = os.path.relpath(change['path'], original_folder_path)
+                relative_dest_path = os.path.relpath(change['new_path'], original_folder_path)
+
+                old_name_path = os.path.join(replica_folder_path, relative_src_path)
+                new_name_path = os.path.join(replica_folder_path, relative_dest_path)
+
+                if os.path.exists(old_name_path):
+                    os.rename(old_name_path, new_name_path)
+                    logging.info(f"[RENAMED] File: {old_name_path} -> {new_name_path}")
+                else:
+                    continue
+
             else:
                 os.rename(dst_path, change['path'])
                 logging.info(f"[RENAMED] Folder: {os.path.normpath(dst_path)} -> {os.path.normpath(change['path'])}")
+
+
+        elif change['type'] == 'moved':
+            print(change)
+            if change['is_file']:
+                ...
+
 
 
 

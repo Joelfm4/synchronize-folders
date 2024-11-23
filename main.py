@@ -45,7 +45,6 @@ def main():
             time.sleep(interval) # * 60
             
             changes = folder_monitor.get_changes()
-            sync.update_replica_folder(original_folder_path, replica_folder_path)
 
             if changes:
                sync.synchronize(original_folder_path, replica_folder_path, changes)

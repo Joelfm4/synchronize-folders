@@ -11,60 +11,51 @@ class MyEventHandler(FileSystemEventHandler):
         super().__init__()
         self.event_queue = event_queue
 
+
     def on_created(self, event:FileSystemEvent) -> None:
-        print(event)
         if event.is_directory:
-            print("Created Folder")
             self._add_event("created", event, is_file=False)
         else:
-            print("Created File")
             self._add_event("created", event, is_file=True)
 
 
     def on_deleted(self, event:FileSystemEvent) -> None:
-        print(event)
         if event.is_directory:
-            print("Deleted Folder")
             self._add_event("deleted", event, is_file=False)
         else:
-            print("Deleted File")
             self._add_event("deleted", event, is_file=True)
 
 
     def on_modified(self, event:FileSystemEvent) -> None:
         if not event.is_directory:
-            print("File Edited")
             self._add_event("modified", event, is_file=True)
 
 
     def on_moved(self, event: FileSystemEvent) -> None:
-        src_parent: str = os.path.dirname(event.src_path)
-        dest_parent: str = os.path.dirname(event.dest_path)
-        
-        print(event)
-        # Rename
+        src_parent = os.path.dirname(event.src_path)
+        dest_parent = os.path.dirname(event.dest_path)
+
+        # Rename #
         if src_parent == dest_parent:
             if event.is_directory:
-                print("Renamed Folder")
-                norm_dest = os.path.normpath(event.dest_path)
-
-                self._add_event("renamed", event, norm_dest,is_file=False)
+                self._add_event("renamed", event, is_file=False)
 
             else:
-                print("Renamed File")
-                self._add_event("renamed", event, is_file=True)
+                self._add_event("renamed", event, new_path=event.dest_path,is_file=True)
 
-        # Move
+        # Move #
         else:
-            if event.is_directory:
-                print("Moved Folder")
-                self._add_event("Moved", event, new_path=dest_parent,is_file=False)
-            else:
-                print("Moved File")
-                self._add_event("Moved", event, is_file=True)
+            src_base = os.path.basename(src_parent)
+            dest_base = os.path.basename(dest_parent)
+
+            if src_base != dest_base:
+                if event.is_directory:
+                    self._add_event("moved", event, new_path=dest_parent,is_file=False)
+                else:
+                    self._add_event("moved", event, is_file=True)
 
 
-    def _add_event(self, event_type: str, event: FileSystemEvent, new_path: Optional[str] = None, is_file: bool = False) -> None:
+    def _add_event(self, event_type: str, event: FileSystemEvent, new_path = None, is_file: bool = False) -> None:
         self.event_queue.put({
             "type": event_type,
             "path": os.path.normpath(event.src_path),
@@ -74,7 +65,7 @@ class MyEventHandler(FileSystemEventHandler):
 
 
 
-def folder_monitoring(path:str, event_queue:Queue, stop_event:Event) -> None:
+def folder_monitoring(path:str, event_queue:Queue, stop_event) -> None:
     event_handler:MyEventHandler = MyEventHandler(event_queue) 
 
     observer = Observer()
@@ -123,7 +114,7 @@ class FolderMonitor:
 
 
 if __name__ == "__main__":
-    path_to_monitor = "D:/Root"
+    path_to_monitor = "/home/joelfm4/watch"
     folder_monitor = FolderMonitor(os.path.normpath(path_to_monitor))
     folder_monitor.start()
 
