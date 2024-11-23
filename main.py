@@ -1,8 +1,10 @@
 import src.synchronization_folders as sync
 from src.input_validation import validation
 from src.watch_changes import FolderMonitor
+import schedule
 import logging
 import time
+
 
 def configure_logging(log_file_path):
     logging.basicConfig(
@@ -21,25 +23,12 @@ def configure_logging(log_file_path):
     logger.addHandler(console_handler)
 
 
-def process_events(changes) -> list:
-    processed = {}
-
-    for change in changes:
-        path = change["path"]
-        if change["type"] == "Deleted":
-            processed[path] = change  
-        elif path not in processed or processed[path]["type"] != "Deleted":
-            processed[path] = change 
-
-    return list(processed.values())
-
-
 def main():
     original_folder_path, replica_folder_path, interval, log_file_path = validation() 
     configure_logging(log_file_path)
 
 
-    # Sync the replica folder if necessary
+    # Sync the replica folder if necessary #
     if sync.replica_folder_is_empty(replica_folder_path):
         sync.duplicate_original(original_folder_path, replica_folder_path) 
 
@@ -47,38 +36,28 @@ def main():
         sync.update_replica_folder(original_folder_path, replica_folder_path)
 
 
-    # Start Monitoring 
+    # Start Monitoring #
     folder_monitor = FolderMonitor(original_folder_path)
     folder_monitor.start()
 
     try:
         while True:
-            time.sleep(interval )
+            time.sleep(interval) # * 60
+            
+            changes = folder_monitor.get_changes()
             sync.update_replica_folder(original_folder_path, replica_folder_path)
 
-            changes = folder_monitor.get_changes()
-
             if changes:
-                changes = process_events(changes)
-                print(changes)
-                # folder_monitor.stop()
-                # sync.synchronize(original_folder_path, replica_folder_path, changes)
+               sync.synchronize(original_folder_path, replica_folder_path, changes)
             
-            folder_monitor.get_changes()
 
 
     except KeyboardInterrupt:
-        folder_monitor.stop()
-    finally:
         folder_monitor.stop()
 
 
 if __name__ == "__main__":
     main()
-
-
-
-
 
 
 
