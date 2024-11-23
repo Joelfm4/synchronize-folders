@@ -159,11 +159,17 @@ def synchronize(original_folder_path:str, replica_folder_path:str, changes:list)
 
 
         elif change['type'] == 'moved':
-            print(change)
+            original_path:str = os.path.join(replica_folder_path, os.path.relpath(change['path'], original_folder_path))
+            destination_path:str = os.path.join(replica_folder_path, os.path.join(os.path.relpath(change['new_path'], original_folder_path), os.path.basename(change['path'])))
             if change['is_file']:
-                ...
+                shutil.move(original_path, destination_path)
+                logging.info(f"[MOVED] File: {original_path} -> {destination_path}")
 
+            else:
+                print(f"origin: {original_path}, dest: {destination_path}")
 
+                shutil.move(original_path, destination_path)
+                logging.info(f"[MOVED] Folder: {original_path} -> {destination_path}")
 
 
 

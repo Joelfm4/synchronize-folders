@@ -1,9 +1,9 @@
 import src.synchronization_folders as sync
 from src.input_validation import validation
 from src.watch_changes import FolderMonitor
-import schedule
 import logging
 import time
+import sys 
 
 
 def configure_logging(log_file_path):
@@ -53,6 +53,7 @@ def main():
 
     except KeyboardInterrupt:
         folder_monitor.stop()
+        sys.exit(0)
 
 
 if __name__ == "__main__":

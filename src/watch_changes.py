@@ -1,9 +1,11 @@
+from logging import exception
 from multiprocessing import Process, Queue, Event
 from typing import List, Optional
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
-import os
 import time
+import sys
+import os
 
 
 class MyEventHandler(FileSystemEventHandler):
@@ -52,7 +54,7 @@ class MyEventHandler(FileSystemEventHandler):
                 if event.is_directory:
                     self._add_event("moved", event, new_path=dest_parent,is_file=False)
                 else:
-                    self._add_event("moved", event, is_file=True)
+                    self._add_event("moved", event, new_path=dest_parent,is_file=True)
 
 
     def _add_event(self, event_type: str, event: FileSystemEvent, new_path = None, is_file: bool = False) -> None:
@@ -75,6 +77,10 @@ def folder_monitoring(path:str, event_queue:Queue, stop_event) -> None:
     try:
         while not stop_event.is_set():
             time.sleep(1)
+
+    except KeyboardInterrupt:
+        sys.exit(0)
+            
     finally:
         observer.stop()
         observer.join()
