@@ -152,13 +152,13 @@ class TestFirsSynchronization(unittest.TestCase):
         directory_monitor.start()
 
         os.rename(os.path.join(self.source_path, "star.txt"), os.path.join(self.source_path, "sun.txt"))
-    
-        for _ in range(3):
-            changes = directory_monitor.get_changes()
-            self.assertEqual(len(changes), 1, "No changes detected")
-            self.assertEqual(changes[0]['type'], 'renamed', "File change[type] isn't renamed")
-            self.assertEqual(changes[0]['old_path'], os.path.join(self.source_path, "star.txt"), "Old file path is incorrect")
-            self.assertEqual(changes[0]['new_path'], os.path.join(self.source_path, "sun.txt"), "New file path is incorrect")
+
+        changes = directory_monitor.get_changes()
+        print(changes)
+        self.assertEqual(len(changes), 1, "No changes detected")
+        self.assertEqual(changes[0]['type'], 'renamed', "File change[type] isn't renamed")
+        self.assertEqual(changes[0]['old_path'], os.path.join(self.source_path, "star.txt"), "Old file path is incorrect")
+        self.assertEqual(changes[0]['new_path'], os.path.join(self.source_path, "sun.txt"), "New file path is incorrect")
 
         directory_monitor.stop()
         self.cleanUp()

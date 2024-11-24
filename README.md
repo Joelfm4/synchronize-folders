@@ -26,7 +26,7 @@ python main.py <Source Directory Path> <Destination Directory Path> <Synchroniza
 ```
 # WARNING ⚠️
 
-**CAUTION**: This software is **not yet fully compatible** with Windows W.
+**CAUTION**: This software is **not yet fully compatible** with Windows
 
 - **Avoid setting the interval too low**, as it may cause instability.
 - **Recommendation**: Set the interval to **at least 5 seconds** to prevent issues.
