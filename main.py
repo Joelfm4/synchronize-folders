@@ -1,9 +1,10 @@
-import src.synchronization_folders as sync
 from src.input_validation import validation
-from src.watch_changes import FolderMonitor
+from src.watchdog import FolderMonitor
+from src.synchronization import *
 import logging
 import time
 import sys 
+import os
 
 
 def configure_logging(log_file_path):
@@ -23,37 +24,58 @@ def configure_logging(log_file_path):
     logger.addHandler(console_handler)
 
 
-def main():
-    original_folder_path, replica_folder_path, interval, log_file_path = validation() 
+
+
+def filter_changes(changes):
+    tmp = []
+
+    for change in changes:
+        if change['type'] in ['created', 'modified'] and os.path.basename(change['path']).startswith('.'):
+            continue
+        elif change['type'] == 'renamed' and os.path.basename(change['path']).startswith('.'):
+            edited_change = {
+                'type':'modified',
+                'path': change['new_path'],
+                'new_path': change['new_path'],
+                'is_file': change['is_file'],
+            }
+            tmp.append(edited_change) 
+    
+        else:
+            tmp.append(change)
+
+    return tmp
+
+
+def main() -> None:
+    source_directory_path, replica_directory_path, interval, log_file_path = validation() 
     configure_logging(log_file_path)
 
-
-    # Sync the replica folder if necessary #
-    if sync.replica_folder_is_empty(replica_folder_path):
-        sync.duplicate_original(original_folder_path, replica_folder_path) 
-
-    else:
-        sync.update_replica_folder(original_folder_path, replica_folder_path)
+    if source_directory_not_empty(source_directory_path):
+        if replica_directory_is_empty(replica_directory_path):
+            duplicate_source(source_directory_path, replica_directory_path) 
+        else:
+            update_replica_directory(source_directory_path, replica_directory_path)
 
 
-    # Start Monitoring #
-    folder_monitor = FolderMonitor(original_folder_path)
-    folder_monitor.start()
+    directory_monitor = FolderMonitor(source_directory_path)
+    directory_monitor.start()
 
     try:
         while True:
-            time.sleep(interval) # * 60
+            time.sleep(interval*60)
             
-            changes = folder_monitor.get_changes()
+            changes = directory_monitor.get_changes()
 
             if changes:
-               sync.synchronize(original_folder_path, replica_folder_path, changes)
-            
+                changes = filter_changes(changes)
+                synchronize(source_directory_path, replica_directory_path, changes)
 
 
     except KeyboardInterrupt:
-        folder_monitor.stop()
+        directory_monitor.stop()
         sys.exit(0)
+
 
 
 if __name__ == "__main__":

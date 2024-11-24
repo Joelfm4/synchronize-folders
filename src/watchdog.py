@@ -1,6 +1,6 @@
-from logging import exception
 from multiprocessing import Process, Queue, Event
 from typing import List, Optional
+from logging import exception
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 import time
@@ -67,7 +67,7 @@ class MyEventHandler(FileSystemEventHandler):
 
 
 
-def folder_monitoring(path:str, event_queue:Queue, stop_event) -> None:
+def directory_monitoring(path:str, event_queue:Queue, stop_event) -> None:
     event_handler:MyEventHandler = MyEventHandler(event_queue) 
 
     observer = Observer()
@@ -98,7 +98,7 @@ class FolderMonitor:
     def start(self) -> None:
         if not self.process or not self.process.is_alive():
             self.process = Process(
-                target=folder_monitoring,
+                target=directory_monitoring,
                 args=(self.path, self.event_queue, self.stop_event),
                 daemon=True
             )
@@ -116,19 +116,4 @@ class FolderMonitor:
         while not self.event_queue.empty():
             changes.append(self.event_queue.get())
         return changes
-
-
-
-if __name__ == "__main__":
-    path_to_monitor = "/home/joelfm4/watch"
-    folder_monitor = FolderMonitor(os.path.normpath(path_to_monitor))
-    folder_monitor.start()
-
-    try:
-        while True:
-            time.sleep(1)
-
-    except KeyboardInterrupt:
-        folder_monitor.stop()
-   
 
