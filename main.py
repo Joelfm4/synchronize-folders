@@ -1,5 +1,5 @@
 from src.input_validation import validation
-from src.watchdog import FolderMonitor
+from src.watch_changes import FolderMonitor
 from src.synchronization import *
 import logging
 import time
@@ -66,7 +66,6 @@ def main() -> None:
             time.sleep(interval*60)
             
             changes = directory_monitor.get_changes()
-
             if changes:
                 changes = filter_changes(changes)
                 synchronize(source_directory_path, replica_directory_path, changes)
@@ -74,6 +73,7 @@ def main() -> None:
 
     except KeyboardInterrupt:
         directory_monitor.stop()
+        update_replica_directory(source_directory_path, replica_directory_path)
         sys.exit(0)
 
 
