@@ -1,6 +1,6 @@
 # Folder Synchronization 
 
-A simple Python tool for synchronizing the contents of a **source folder** with a **destination folder**.
+A simple script for synchronizing the contents of a **source folder** with a **destination folder**.
 
 ## Features
 - **Folder Synchronization**: Reflects all changes made in the source folder to the replica.
