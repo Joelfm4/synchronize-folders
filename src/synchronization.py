@@ -91,7 +91,7 @@ def update_replica_directory(source_directory_path: str, replica_directory_path:
                 
                 if not os.path.exists(replica_dir):
                     os.makedirs(replica_dir)
-                    logging.info(f"Deleted folder: {replica_dir}")
+                    logging.info(f"[CREATED] folder: {replica_dir}")
 
                 if os.stat(source_dir).st_mtime > os.stat(replica_dir).st_mtime:
                     futures.append(executor.submit(copy_file, source_dir, replica_dir))

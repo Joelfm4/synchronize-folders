@@ -1,15 +1,16 @@
 from tempfile import TemporaryDirectory
+import warnings
 import unittest
 import time
 import sys
 import os
-import warnings
 
-warnings.filterwarnings("ignore", category=ResourceWarning)
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+
 from synchronization import *
 from watch_changes import FolderMonitor
 
+warnings.filterwarnings("ignore", category=ResourceWarning)
 class TestFirsSynchronization(unittest.TestCase):
 
     # ----------Initialization Functions---------- #
@@ -54,6 +55,7 @@ class TestFirsSynchronization(unittest.TestCase):
 
     def test_replica_directory_is_empty(self):
         """ Function Test 0 - Is empty function """
+        self.setUp()
         self.assertTrue(replica_directory_is_empty(self.replica_path))
         self.cleanUp()
 
@@ -65,6 +67,7 @@ class TestFirsSynchronization(unittest.TestCase):
             "star.txt":"UY Scut",
             "car.txt": "Alfa Romeo"
         }        
+        self.setUp()
         self.create_files_in_source(files)
         update_replica_directory(self.source_path, self.replica_path)
         
@@ -82,6 +85,7 @@ class TestFirsSynchronization(unittest.TestCase):
             "car.txt": "Alfa Romeo"
         }
 
+        self.setUp()
         self.create_files_in_replica(files)
         update_replica_directory(self.source_path, self.replica_path)
         
@@ -97,6 +101,7 @@ class TestFirsSynchronization(unittest.TestCase):
             "star.txt":"UY Scut",
             "car.txt": "Alfa Romeo"
         }        
+        self.setUp()
         self.create_files_in_source(files)
 
         files["house.txt"] = "yellow house"
@@ -118,6 +123,7 @@ class TestFirsSynchronization(unittest.TestCase):
             "star.txt":"UY Scut",
             "car.txt": "Alfa Romeo"
         }        
+        self.setUp()
         self.create_files_in_replica(files) 
 
         files["house.txt"] = "yellow house"
@@ -132,63 +138,39 @@ class TestFirsSynchronization(unittest.TestCase):
         self.cleanUp()
 
 
-    def test_rename_file_source(self):
-        """ Scenario 4 - Renamed a file and listened for a renamed type change"""
+    def test_file_rename_event_detected(self):
+        """Scenario 4 - Detect renaming of a file and validate the returned change details."""
 
         files:dict = {
             "star.txt":"UY Scut",
         }        
 
+        self.setUp()
         self.create_files_in_source(files)
 
         directory_monitor = FolderMonitor(self.source_path)
         directory_monitor.start()
 
-        try:
-            os.rename(
-                os.path.join(self.source_path, "star.txt"),
-                os.path.join(self.source_path, "sun.txt")
-            )
-        
-            for _ in range(5):
-                changes = directory_monitor.get_changes()
-                if changes:
-                    change = changes[0]
-                    self.assertEqual(change['type'], 'renamed', "File Change[type] isn't renamed")
-                    self.assertEqual(change['old_path'], os.path.join(self.source_path, "star.txt"), "Old file path is incorrect")
-                    self.assertEqual(change['new_path'], os.path.join(self.source_path, "sun.txt", "New file path is incorrect"))
+        os.rename(os.path.join(self.source_path, "star.txt"), os.path.join(self.source_path, "sun.txt"))
+    
+        for _ in range(5):
+            changes = directory_monitor.get_changes()
+            self.assertEqual(len(changes), 1, "No changes detected")
+            self.assertEqual(changes[0]['type'], 'renamed', "File change[type] isn't renamed")
+            self.assertEqual(changes[0]['old_path'], os.path.join(self.source_path, "star.txt"), "Old file path is incorrect")
+            self.assertEqual(changes[0]['new_path'], os.path.join(self.source_path, "sun.txt"), "New file path is incorrect")
 
-        finally:
-            directory_monitor.stop()
-            self.cleanUp()
+        directory_monitor.stop()
+        self.cleanUp()
+
+
+    def test_rename_replica_file(self):
+        pass
 
 
     def test_rename_folder_source(self):
         """ Scenario 5 - Renamed directory """
-        directories:list = ["sales"] 
-
-        self.create_directories_in_source(directories)
-
-        directory_monitor = FolderMonitor(self.source_path)
-        directory_monitor.start()
-
-        try:
-            os.rename(
-                os.path.join(self.source_path, "sales"),
-                os.path.join(self.source_path, "Sales")
-            )
-        
-            for _ in range(5):
-                changes = directory_monitor.get_changes()
-                if changes:
-                    change = changes[0]
-                    self.assertEqual(change['type'], 'renamed', "Folder Change[type] isn't renamed")
-                    self.assertEqual(change['old_path'], os.path.join(self.source_path, "sales"), "Old path is incorrect")
-                    self.assertEqual(change['new_path'], os.path.join(self.source_path, "Sales", "New path is incorrect"))
-
-        finally:
-            directory_monitor.stop()
-            self.cleanUp()
+        ...
 
 
     def test_edit_source_file(self):

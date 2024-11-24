@@ -66,10 +66,10 @@ def main() -> None:
             time.sleep(interval*60)
             
             changes = directory_monitor.get_changes()
+
             if changes:
                 changes = filter_changes(changes)
                 synchronize(source_directory_path, replica_directory_path, changes)
-
 
     except KeyboardInterrupt:
         directory_monitor.stop()

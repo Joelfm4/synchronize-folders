@@ -1,8 +1,8 @@
+from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from multiprocessing import Process, Queue, Event
+from watchdog.observers import Observer
 from typing import List, Optional
 from logging import exception
-from watchdog.events import FileSystemEvent, FileSystemEventHandler
-from watchdog.observers import Observer
 import time
 import sys
 import os
