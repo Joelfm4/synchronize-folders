@@ -1,3 +1,4 @@
+from typing import Dict, Union
 from src.input_validation import validation
 from src.watch_changes import FolderMonitor
 from src.synchronization import *
@@ -7,7 +8,7 @@ import sys
 import os
 
 
-def configure_logging(log_file_path):
+def configure_logging(log_file_path) -> None:
     logging.basicConfig(
         filename=log_file_path,
         format='%(levelname)s - %(asctime)s - %(message)s',
@@ -26,8 +27,8 @@ def configure_logging(log_file_path):
 
 
 
-def filter_changes(changes):
-    tmp = []
+def filter_changes(changes: List[Dict]) -> List[Dict]:
+    tmp:list = []
 
     for change in changes:
         if change['type'] in ['created', 'modified'] and os.path.basename(change['path']).startswith('.'):
@@ -65,10 +66,10 @@ def main() -> None:
         while True:
             time.sleep(interval)
             
-            changes = directory_monitor.get_changes()
+            changes:list = directory_monitor.get_changes()
 
             if changes:
-                changes = filter_changes(changes)
+                changes:list = filter_changes(changes)
                 synchronize(source_directory_path, replica_directory_path, changes)
 
     except KeyboardInterrupt:
@@ -80,26 +81,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

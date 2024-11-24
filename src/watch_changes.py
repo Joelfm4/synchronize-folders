@@ -34,8 +34,8 @@ class MyEventHandler(FileSystemEventHandler):
 
 
     def on_moved(self, event: FileSystemEvent) -> None:
-        src_parent = os.path.dirname(event.src_path)
-        dest_parent = os.path.dirname(event.dest_path)
+        src_parent:str = os.path.dirname(event.src_path)
+        dest_parent:str = os.path.dirname(event.dest_path)
 
         # Rename #
         if src_parent == dest_parent:
@@ -47,8 +47,8 @@ class MyEventHandler(FileSystemEventHandler):
 
         # Move #
         else:
-            src_base = os.path.basename(src_parent)
-            dest_base = os.path.basename(dest_parent)
+            src_base:str = os.path.basename(src_parent)
+            dest_base:str = os.path.basename(dest_parent)
 
             if src_base != dest_base:
                 if event.is_directory:
@@ -70,7 +70,7 @@ class MyEventHandler(FileSystemEventHandler):
 def directory_monitoring(path:str, event_queue:Queue, stop_event) -> None:
     event_handler:MyEventHandler = MyEventHandler(event_queue) 
 
-    observer = Observer()
+    observer:Observer = Observer()
     observer.schedule(event_handler, path, recursive=True)
     observer.start()
 
