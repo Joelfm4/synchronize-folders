@@ -22,7 +22,7 @@ pip install -r requirements.txt
 ```
 ## How to Use
 ``` 
-python main.py <Source Directory Path> <Destination Directory Path> <Synchronization interval in Minutes> <Log file Location>
+python main.py <Source Directory Path> <Destination Directory Path> <Synchronization interval in Seconds> <Log file Location>
 ```
 
 

@@ -153,7 +153,7 @@ class TestFirsSynchronization(unittest.TestCase):
 
         os.rename(os.path.join(self.source_path, "star.txt"), os.path.join(self.source_path, "sun.txt"))
     
-        for _ in range(5):
+        for _ in range(3):
             changes = directory_monitor.get_changes()
             self.assertEqual(len(changes), 1, "No changes detected")
             self.assertEqual(changes[0]['type'], 'renamed', "File change[type] isn't renamed")

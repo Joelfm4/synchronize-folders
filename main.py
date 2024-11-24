@@ -63,7 +63,7 @@ def main() -> None:
 
     try:
         while True:
-            time.sleep(interval*60)
+            time.sleep(interval)
             
             changes = directory_monitor.get_changes()
 

@@ -4,11 +4,11 @@ import os
 
 def show_error_text():
     print("Error: Incorrect number of arguments \n")
-    print("Usage: python main.py <Source Folder Path> <Replica Folder Path> <Synchronization interval in Minutes> <Log File Location>")
+    print("Usage: python main.py <Source Folder Path> <Replica Folder Path> <Synchronization interval in Seconds> <Log File Location>")
     print("\nArguments:")
     print("  1. Source Folder Path - Path to the source folder.")
     print("  2. Replica Folder Path - Path to the destination folder.")
-    print("  3. Synchronization interval - Time interval (in minutes) for synchronization.")
+    print("  3. Synchronization interval - Time interval (in seconds) for synchronization.")
     print("  4. Log File Location - Path to the log file. \n")
 
 
