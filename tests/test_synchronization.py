@@ -191,17 +191,29 @@ class TestFirsSynchronization(unittest.TestCase):
             self.cleanUp()
 
 
-    def test_modify_file_source(self):
-        ...
-    def test_add_file_source(self):
-        ...
-    def test_add_folder_source(self):
-        ...
-    def test_move_file_source(self):
-        ...
-    def test_move_folder_source(self):
+    def test_edit_source_file(self):
+        """ Scenario 6 - Edit a file inside source directory """
         ...
 
+
+    def test_add_file_source(self):
+        """ Scenario 7 - Add a file to the original directory that is not in the replica """
+        ...
+
+        
+    def test_add_directory_source(self):
+        """ Scenario 8 - Add a directory to the original directory that is not in the replica """
+        ...
+
+        
+    def test_move_file_source(self):
+        """ Scenario 9 - Move a file from directory A to directory B """
+        ...
+
+        
+    def test_move_folder_source(self):
+        """ Scenario 10 - Move a directory from directory A to directory B """
+        ...
 
 
 if __name__=='__main__':
