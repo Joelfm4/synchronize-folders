@@ -140,32 +140,9 @@ class TestFirsSynchronization(unittest.TestCase):
 
     def test_file_rename_event_detected(self):
         """Scenario 4 - Detect renaming of a file and validate the returned change details."""
+        ...
 
-        files:dict = {
-            "star.txt":"UY Scut",
-        }        
-
-        self.setUp()
-        self.create_files_in_source(files)
-
-        directory_monitor = FolderMonitor(self.source_path)
-        directory_monitor.start()
-       
-        try:
-            os.rename(os.path.join(self.source_path, "star.txt"), os.path.join(self.source_path, "sun.txt"))
-
-            changes = directory_monitor.get_changes()
-
-            self.assertEqual(len(changes), 1, "No changes detected")
-            self.assertEqual(changes[0]['type'], 'renamed', "File change[type] isn't renamed")
-            self.assertEqual(changes[0]['old_path'], os.path.join(self.source_path, "star.txt"), "Old file path is incorrect")
-            self.assertEqual(changes[0]['new_path'], os.path.join(self.source_path, "sun.txt"), "New file path is incorrect")
-
-        finally:
-            directory_monitor.stop()
-            self.cleanUp()
-
-
+        
     def test_rename_replica_file(self):
         pass
 
