@@ -74,7 +74,10 @@ def main() -> None:
 
     except KeyboardInterrupt:
         directory_monitor.stop()
+        print("Running file integrity checks")
         update_replica_directory(source_directory_path, replica_directory_path)
+        print("All integrity checks completed")
+
         sys.exit(0)
 
 
