@@ -8,7 +8,7 @@ A simple script for synchronizing the contents of a **source folder** with a **d
 - **Performance**: Uses **multithreading** for efficient I/O operations and **parallelism** to watch for changes
 - **Logs**: Keeps a record of all logs.
 
-# Installation
+## Installation
 
 #### 1. Clone the repository:
 ```
@@ -20,7 +20,7 @@ cd synchronize-folders
 ```
 pip install -r requirements.txt
 ```
-# How to Use
+## How to Use
 ``` 
 python main.py <Source Directory Path> <Destination Directory Path> <Synchronization interval in Minutes> <Log file Location>
 ```
