@@ -24,7 +24,7 @@ pip install -r requirements.txt
 ``` 
 python main.py <Source Directory Path> <Destination Directory Path> <Synchronization interval in Seconds> <Log file Location>
 ```
-# WARNING ⚠️
+## WARNING ⚠️
 
 **CAUTION**: This software is **not yet fully compatible** with Windows
 
@@ -33,13 +33,11 @@ python main.py <Source Directory Path> <Destination Directory Path> <Synchroniza
 
 
 
-#### To Do
+## To Do
 - Default log file
 - Windows compatibility 
-- Remove wathdog dependency
 - Improve changes filter 
 - Reduce the number of os.join and os.path.normpath
-- Cache (files hash)
 
 
 
