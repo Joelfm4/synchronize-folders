@@ -166,7 +166,7 @@ class TestFirsSynchronization(unittest.TestCase):
             self.cleanUp()
 
 
-    def test_rename_folder_source(self):
+    def test_rename_directory_source(self):
         """Scenario 5 - Detect renaming of a directory and validate the returned change details."""
         directories:list = ["photos_2020"]
 
@@ -293,7 +293,7 @@ class TestFirsSynchronization(unittest.TestCase):
             self.cleanUp()
 
         
-    def test_move_folder_source(self):
+    def test_move_directory_source(self):
         """ Scenario 10 - Move a directory from directory A to directory B """
         directories:List[str] = ["photos", "photos_summer"]
 
