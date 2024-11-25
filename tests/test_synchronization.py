@@ -286,7 +286,7 @@ class TestFirsSynchronization(unittest.TestCase):
             changes = directory_monitor.get_changes()
 
             self.assertEqual(len(changes), 1, "No changes detected")
-            self.assertEqual(changes[0]['type'], 'moved', "Directory change[type] isn't moved")
+            self.assertEqual(changes[0]['type'], 'moved', "File change[type] isn't moved")
 
         finally:
             directory_monitor.stop()
@@ -296,6 +296,7 @@ class TestFirsSynchronization(unittest.TestCase):
     def test_move_folder_source(self):
         """ Scenario 10 - Move a directory from directory A to directory B """
         directories:List[str] = ["photos", "photos_summer"]
+
         self.setUp()
         self.create_directories_in_source(directories)
 
