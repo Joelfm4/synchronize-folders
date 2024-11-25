@@ -1,6 +1,7 @@
 from tempfile import TemporaryDirectory
-import warnings
+from pathlib import Path
 import unittest
+import warnings
 import time
 import sys
 import os
@@ -140,43 +141,181 @@ class TestFirsSynchronization(unittest.TestCase):
 
     def test_file_rename_event_detected(self):
         """Scenario 4 - Detect renaming of a file and validate the returned change details."""
-        ...
 
-        
-    def test_rename_replica_file(self):
-        pass
+        files:dict = {
+            "star.txt":"UY Scut",
+        }        
+
+        self.setUp()
+        self.create_files_in_source(files)
+
+        directory_monitor = FolderMonitor(self.source_path)
+        directory_monitor.start()
+        time.sleep(1)
+       
+        try:
+            os.rename(os.path.join(self.source_path, "star.txt"), os.path.join(self.source_path, "sun.txt"))
+            time.sleep(1)
+            changes = directory_monitor.get_changes()
+
+            self.assertEqual(len(changes), 1, "No changes detected")
+            self.assertEqual(changes[0]['type'], 'renamed', "File change[type] isn't renamed")
+
+        finally:
+            directory_monitor.stop()
+            self.cleanUp()
 
 
     def test_rename_folder_source(self):
-        """ Scenario 5 - Renamed directory """
-        ...
+        """Scenario 5 - Detect renaming of a directory and validate the returned change details."""
+        directories:list = ["photos_2020"]
+
+        self.setUp()
+        self.create_directories_in_source(directories)
+
+        directory_monitor = FolderMonitor(self.source_path)
+        directory_monitor.start()
+        time.sleep(1)
+       
+        try:
+            os.rename(os.path.join(self.source_path, "photos_2020"), os.path.join(self.source_path, "photos_2021"))
+            time.sleep(1)
+            changes = directory_monitor.get_changes()
+
+            self.assertEqual(len(changes), 1, "No changes detected")
+            self.assertEqual(changes[0]['type'], 'renamed', "Folder change[type] isn't renamed")
+
+        finally:
+            directory_monitor.stop()
+            self.cleanUp()
+
 
 
     def test_edit_source_file(self):
         """ Scenario 6 - Edit a file inside source directory """
-        ...
+        files:dict = {
+            "tasks.txt":"Read \n"
+        } 
+
+        self.setUp()
+        self.create_files_in_source(files)
+
+        directory_monitor = FolderMonitor(self.source_path)
+        directory_monitor.start()
+        time.sleep(1)
+       
+        try:
+            path:str = os.path.join(self.source_path, "tasks.txt")
+            with open(path, "w") as f:
+                f.write("Write")
+            
+            time.sleep(1)
+            changes = directory_monitor.get_changes()
+
+            self.assertEqual(len(changes), 1, "No changes detected")
+            self.assertEqual(changes[0]['type'], 'modified', "File change[type] isn't modified")
+
+        finally:
+            directory_monitor.stop()
+            self.cleanUp()
 
 
     def test_add_file_source(self):
-        """ Scenario 7 - Add a file to the original directory that is not in the replica """
-        ...
+        """ Scenario 7 - Add a file to the original directory and verify if it was detected"""
+        self.setUp()
+
+        directory_monitor = FolderMonitor(self.source_path)
+        directory_monitor.start()
+        time.sleep(1)
+       
+        try:
+            Path(os.path.join(self.source_path, "homework.txt")).touch()
+
+            time.sleep(1)
+
+            changes = directory_monitor.get_changes()
+
+            self.assertEqual(len(changes), 1, "No changes detected")
+            self.assertEqual(changes[0]['type'], 'created', "File change[type] isn't created")
+
+        finally:
+            directory_monitor.stop()
+            self.cleanUp()
+
 
         
     def test_add_directory_source(self):
         """ Scenario 8 - Add a directory to the original directory that is not in the replica """
-        ...
+        self.setUp()
+
+        directory_monitor = FolderMonitor(self.source_path)
+        directory_monitor.start()
+        time.sleep(1)
+       
+        try:
+            Path(os.path.join(self.source_path, "photos")).touch()
+
+            time.sleep(1)
+
+            changes = directory_monitor.get_changes()
+
+            self.assertEqual(len(changes), 1, "No changes detected")
+            self.assertEqual(changes[0]['type'], 'created', "Directory change[type] isn't created")
+
+        finally:
+            directory_monitor.stop()
+            self.cleanUp()
 
         
     def test_move_file_source(self):
         """ Scenario 9 - Move a file from directory A to directory B """
-        ...
+        directories:List[str] = ["photos"]
+        self.setUp()
+        self.create_directories_in_source(directories)
+        Path(os.path.join(self.source_path, "photo.txt")).touch()
+
+        directory_monitor = FolderMonitor(self.source_path)
+        directory_monitor.start()
+        time.sleep(1)
+       
+        try:
+            shutil.move(os.path.join(self.source_path, "photo.txt"), os.path.join(self.source_path, "photos"))
+
+            time.sleep(1)
+
+            changes = directory_monitor.get_changes()
+
+            self.assertEqual(len(changes), 1, "No changes detected")
+            self.assertEqual(changes[0]['type'], 'moved', "Directory change[type] isn't moved")
+
+        finally:
+            directory_monitor.stop()
+            self.cleanUp()
 
         
     def test_move_folder_source(self):
         """ Scenario 10 - Move a directory from directory A to directory B """
-        ...
+        directories:List[str] = ["photos", "photos_summer"]
+        self.setUp()
+        self.create_directories_in_source(directories)
+
+        directory_monitor = FolderMonitor(self.source_path)
+        directory_monitor.start()
+        time.sleep(1)
+       
+        try:
+            shutil.move(os.path.join(self.source_path, "photos_summer"), os.path.join(self.source_path, "photos"))
+            time.sleep(1)
+
+            changes = directory_monitor.get_changes()
+
+            self.assertEqual(len(changes), 1, "No changes detected")
+            self.assertEqual(changes[0]['type'], 'moved', "Directory change[type] isn't moved")
+
+        finally:
+            directory_monitor.stop()
+            self.cleanUp()
 
 
 if __name__=='__main__':
     unittest.main()
-
