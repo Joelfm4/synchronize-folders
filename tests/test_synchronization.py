@@ -9,7 +9,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 
 from synchronization import *
-from watch_changes import FolderMonitor
+from watch_changes import DirectoryMonitor 
 
 warnings.filterwarnings("ignore", category=ResourceWarning)
 class TestFirsSynchronization(unittest.TestCase):
@@ -149,7 +149,7 @@ class TestFirsSynchronization(unittest.TestCase):
         self.setUp()
         self.create_files_in_source(files)
 
-        directory_monitor = FolderMonitor(self.source_path)
+        directory_monitor = DirectoryMonitor(self.source_path)
         directory_monitor.start()
         time.sleep(1)
        
@@ -173,7 +173,7 @@ class TestFirsSynchronization(unittest.TestCase):
         self.setUp()
         self.create_directories_in_source(directories)
 
-        directory_monitor = FolderMonitor(self.source_path)
+        directory_monitor = DirectoryMonitor(self.source_path)
         directory_monitor.start()
         time.sleep(1)
        
@@ -199,7 +199,7 @@ class TestFirsSynchronization(unittest.TestCase):
         self.setUp()
         self.create_files_in_source(files)
 
-        directory_monitor = FolderMonitor(self.source_path)
+        directory_monitor = DirectoryMonitor(self.source_path)
         directory_monitor.start()
         time.sleep(1)
        
@@ -223,7 +223,7 @@ class TestFirsSynchronization(unittest.TestCase):
         """ Scenario 7 - Add a file to the original directory and verify if it was detected"""
         self.setUp()
 
-        directory_monitor = FolderMonitor(self.source_path)
+        directory_monitor = DirectoryMonitor(self.source_path)
         directory_monitor.start()
         time.sleep(1)
        
@@ -246,7 +246,7 @@ class TestFirsSynchronization(unittest.TestCase):
         """ Scenario 8 - Add a directory to the original directory that is not in the replica """
         self.setUp()
 
-        directory_monitor = FolderMonitor(self.source_path)
+        directory_monitor = DirectoryMonitor(self.source_path)
         directory_monitor.start()
         time.sleep(1)
        
@@ -272,7 +272,7 @@ class TestFirsSynchronization(unittest.TestCase):
         self.create_directories_in_source(directories)
         Path(os.path.join(self.source_path, "photo.txt")).touch()
 
-        directory_monitor = FolderMonitor(self.source_path)
+        directory_monitor = DirectoryMonitor(self.source_path)
         directory_monitor.start()
         time.sleep(1)
        
@@ -298,7 +298,7 @@ class TestFirsSynchronization(unittest.TestCase):
         self.setUp()
         self.create_directories_in_source(directories)
 
-        directory_monitor = FolderMonitor(self.source_path)
+        directory_monitor = DirectoryMonitor(self.source_path)
         directory_monitor.start()
         time.sleep(1)
        
