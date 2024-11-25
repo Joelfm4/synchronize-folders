@@ -1,8 +1,7 @@
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from multiprocessing import Process, Queue, Event
 from watchdog.observers import Observer
-from typing import List, Optional
-from logging import exception
+from typing import List 
 import time
 import sys
 import os
@@ -34,8 +33,8 @@ class MyEventHandler(FileSystemEventHandler):
 
 
     def on_moved(self, event: FileSystemEvent) -> None:
-        src_parent:str = os.path.dirname(event.src_path)
-        dest_parent:str = os.path.dirname(event.dest_path)
+        src_parent:str|bytes = os.path.dirname(event.src_path)
+        dest_parent:str|bytes = os.path.dirname(event.dest_path)
 
         # Rename #
         if src_parent == dest_parent:
@@ -47,8 +46,8 @@ class MyEventHandler(FileSystemEventHandler):
 
         # Move #
         else:
-            src_base:str = os.path.basename(src_parent)
-            dest_base:str = os.path.basename(dest_parent)
+            src_base:str|bytes = os.path.basename(src_parent)
+            dest_base:str|bytes = os.path.basename(dest_parent)
 
             if src_base != dest_base:
                 if event.is_directory:
@@ -70,7 +69,7 @@ class MyEventHandler(FileSystemEventHandler):
 def directory_monitoring(path:str, event_queue:Queue, stop_event) -> None:
     event_handler:MyEventHandler = MyEventHandler(event_queue) 
 
-    observer:Observer = Observer()
+    observer = Observer()
     observer.schedule(event_handler, path, recursive=True)
     observer.start()
 
