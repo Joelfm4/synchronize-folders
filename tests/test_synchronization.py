@@ -190,7 +190,6 @@ class TestFirsSynchronization(unittest.TestCase):
             self.cleanUp()
 
 
-
     def test_edit_source_file(self):
         """ Scenario 6 - Edit a file inside source directory """
         files:dict = {
@@ -241,7 +240,6 @@ class TestFirsSynchronization(unittest.TestCase):
         finally:
             directory_monitor.stop()
             self.cleanUp()
-
 
         
     def test_add_directory_source(self):
