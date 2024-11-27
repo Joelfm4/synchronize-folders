@@ -17,6 +17,15 @@ def source_directory_not_empty(source_path:str) -> bool:
 
 
 def copy_file(source_path: str, replica_path: str) -> None:
+    """
+    Copies a file or folder from the source path to the replica path.
+    
+    Args:
+    - source_path: Path to the source file or directory.
+    - replica_path: Path to the destination file or directory.
+    
+    Logs the copy action.
+    """
     if os.path.isfile(source_path):
         shutil.copy2(src=source_path, dst=replica_path) 
         logging.info(f"[COPIED] File: {source_path} -> {replica_path}")
@@ -27,6 +36,14 @@ def copy_file(source_path: str, replica_path: str) -> None:
 
 
 def delete_extra_files(replica_path: str) -> None:
+    """
+    Deletes extra files or directories in the replica path that do not exist in the source.
+    
+    Args:
+    - replica_path: Path to the file or directory in the replica location to be deleted.
+    
+    Logs the deletion action.
+    """
     if os.path.isfile(replica_path):
         os.remove(path=replica_path)
         logging.info(f"[DELETED] File: {replica_path}")
@@ -37,12 +54,29 @@ def delete_extra_files(replica_path: str) -> None:
 
 
 def duplicate_source(source_directory_path:str, replica_directory_path:str) -> None:
+    """
+    Creates an identical copy of the source directory in the replica location.
+    
+    Args:
+    - source_directory_path: Path to the source directory.
+    - replica_directory_path: Path to the replica directory to copy files and folders to.
+    
+    Uses multithreading to speed up the copy process.
+    """
     if not os.path.exists(replica_directory_path):
         os.makedirs(replica_directory_path)
         logging.info(f"[CREATED] Folder: {replica_directory_path}")
 
 
     def copy_item(item_path: str, base_source: str, base_replica: str) -> None:
+        """
+        Helper function to copy individual items (files or directories) to the replica location.
+        
+        Args:
+        - item_path: Path to the item (file or folder) to copy.
+        - base_source: Base source directory for relative path calculation.
+        - base_replica: Base replica directory for destination.
+        """
         relative_path:str = os.path.relpath(path=item_path, start=base_source)
         target_path:str = os.path.join(base_replica, relative_path)
 
@@ -67,7 +101,15 @@ def duplicate_source(source_directory_path:str, replica_directory_path:str) -> N
 
 
 def update_replica_directory(source_directory_path: str, replica_directory_path: str) -> None:
-
+    """
+    Updates the replica directory to match the source directory.
+    
+    Args:
+    - source_directory_path: Path to the source directory.
+    - replica_directory_path: Path to the replica directory.
+    
+    Uses multithreading to process file/folder updates.
+    """
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures:List[concurrent.futures.Future] = []
 
@@ -119,6 +161,16 @@ def update_replica_directory(source_directory_path: str, replica_directory_path:
 
 
 def synchronize(source_directory_path:str, replica_directory_path:str, changes:list) -> None:
+    """
+    Synchronizes the replica directory based on the detected changes (created, deleted, renamed, moved, modified).
+    
+    Args:
+    - source_directory_path: Path to the source directory.
+    - replica_directory_path: Path to the replica directory.
+    - changes: A list of dictionaries representing the changes in the source directory (created, deleted, renamed, moved, modified).
+    
+    For each change type, the appropriate action (copy, delete, rename, etc.) is performed.
+    """
     for change in changes:
         rel_path:str = os.path.relpath(change['path'], source_directory_path)
         dst_path:str = os.path.join(replica_directory_path, rel_path)
