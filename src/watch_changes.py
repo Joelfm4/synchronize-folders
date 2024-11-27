@@ -8,12 +8,24 @@ import os
 
 
 class MyEventHandler(FileSystemEventHandler):
+    """
+    Initializes the event handler for file system events.
+
+    Args:
+    - event_queue: Queue to collect file system event changes.
+    """
     def __init__(self, event_queue:Queue):
         super().__init__()
         self.event_queue = event_queue
 
 
     def on_created(self, event:FileSystemEvent) -> None:
+        """
+        Handles the event when a new file or directory is created.
+
+        Args:
+        - event: The file system event triggered by creation.
+        """
         if event.is_directory:
             self._add_event("created", event, is_file=False)
         else:
@@ -21,6 +33,12 @@ class MyEventHandler(FileSystemEventHandler):
 
 
     def on_deleted(self, event:FileSystemEvent) -> None:
+        """
+        Handles the event when a file or directory is deleted.
+
+        Args:
+        - event: The file system event triggered by deletion.
+        """
         if event.is_directory:
             self._add_event("deleted", event, is_file=False)
         else:
@@ -28,11 +46,23 @@ class MyEventHandler(FileSystemEventHandler):
 
 
     def on_modified(self, event:FileSystemEvent) -> None:
+        """
+        Handles the event when a file is modified.
+
+        Args:
+        - event: The file system event triggered by modification.
+        """
         if not event.is_directory:
             self._add_event("modified", event, is_file=True)
 
 
     def on_moved(self, event: FileSystemEvent) -> None:
+        """
+        Handles the event when a file or directory is moved or renamed.
+
+        Args:
+        - event: The file system event triggered by a move or rename.
+        """
         src_parent:str|bytes = os.path.dirname(event.src_path)
         dest_parent:str|bytes = os.path.dirname(event.dest_path)
 
@@ -57,6 +87,15 @@ class MyEventHandler(FileSystemEventHandler):
 
 
     def _add_event(self, event_type: str, event: FileSystemEvent, new_path = None, is_file: bool = False) -> None:
+        """
+        Adds the file system event to the event queue.
+
+        Args:
+        - event_type: Type of the event (created, deleted, modified, moved, renamed).
+        - event: The file system event that triggered the action.
+        - new_path: The new path for moved or renamed files.
+        - is_file: Boolean flag indicating whether the event is related to a file (True) or directory (False).
+        """
         self.event_queue.put({
             "type": event_type,
             "path": os.path.normpath(event.src_path),
@@ -67,6 +106,14 @@ class MyEventHandler(FileSystemEventHandler):
 
 
 def directory_monitoring(path:str, event_queue:Queue, stop_event) -> None:
+    """
+    Monitors the specified directory for file system events.
+
+    Args:
+    - path: The directory to monitor.
+    - event_queue: Queue to collect file system event changes.
+    - stop_event: Event to signal when to stop monitoring.
+    """
     event_handler:MyEventHandler = MyEventHandler(event_queue) 
 
     observer = Observer()
@@ -88,6 +135,12 @@ def directory_monitoring(path:str, event_queue:Queue, stop_event) -> None:
 
 class FolderMonitor:
     def __init__(self, path: str):
+        """
+        Initializes the folder monitoring process.
+
+        Args:
+        - path: The path to the directory to monitor.
+        """
         self.path = path
         self.event_queue = Queue()
         self.stop_event = Event()
@@ -95,6 +148,9 @@ class FolderMonitor:
 
 
     def start(self) -> None:
+        """
+        Starts the folder monitoring process if not already running.
+        """
         if not self.process or not self.process.is_alive():
             self.process = Process(
                 target=directory_monitoring,
@@ -105,12 +161,21 @@ class FolderMonitor:
 
 
     def stop(self) -> None:
+        """
+        Stops the folder monitoring process.
+        """
         if self.process and self.process.is_alive():
             self.stop_event.set()
             self.process.join()
 
 
     def get_changes(self) -> List[dict]:
+        """
+        Retrieves any detected changes in the monitored directory.
+
+        Returns:
+        - List of changes, each represented as a dictionary containing event type, path, etc.
+        """
         changes = []
         while not self.event_queue.empty():
             changes.append(self.event_queue.get())
