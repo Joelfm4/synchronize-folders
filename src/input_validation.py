@@ -13,6 +13,10 @@ def show_error_text():
 
 
 def valid_path(path:str) -> bool:
+    """
+    Verifies if the given path exists or if it can be created. 
+    Returns True if the path is valid or created, otherwise returns False.
+    """
     if os.path.exists(path):
         return True
 
@@ -25,7 +29,12 @@ def valid_path(path:str) -> bool:
 
 
 def input_validation() -> bool:
-
+    """
+    Validates the user input by checking the number of arguments and ensuring 
+    each argument is correct (valid paths, valid synchronization interval, 
+    and valid log file).
+    Returns True if all inputs are valid, otherwise returns False.
+    """
     errors = []
 
     if len(sys.argv) < 5:
@@ -58,6 +67,10 @@ def input_validation() -> bool:
 
 
 def validation() -> tuple:
+    """
+    Performs input validation and returns the valid arguments as a tuple.
+    If validation fails, the program exits with a status code of 1.
+    """
     if input_validation():
         return sys.argv[1], sys.argv[2], int(sys.argv[3]), sys.argv[4]
     else:
